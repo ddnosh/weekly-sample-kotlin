@@ -1,5 +1,7 @@
 package com.androidwind.weekly.kotlin
 
+import java.math.BigInteger
+
 /**
  * @author  ddnosh
  * @website http://blog.csdn.net/ddnosh
@@ -58,14 +60,34 @@ fun main(args: Array<String>) {
         "Zoo"
     }
     println(lazyByLazy)
-
+    /*
+    is 判断类型
+     */
+    if ("kotlin" is String) {
+        println("it's string")
+    }
+    /*
+    as 类型转换
+     */
+    val y: Int? = 123;
+    val x: String? = y as? String;
+    println(x);
     /*
     函数
      */
-    fun method(name: String): String {//单个参数
+    fun method1(name: String): String {//单个参数
         return "hello $name"
     }
-    println(method("kotlin"))
+
+    fun method2(name: String) = {
+        "hello $name"
+    }
+
+    fun method3(name: String) = "hello $name"
+
+    println(method1("kotlin1"))
+    println(method2("kotlin2"))
+    println(method3("kotlin3"))
 
     fun methodWithMultipleArgs(vararg name: String) {//多个参数
         println("params size is ${name.size}")
@@ -75,6 +97,9 @@ fun main(args: Array<String>) {
 
     fun methodWithOneLine(age: Int): Boolean = age == 20
     println(methodWithOneLine(20))
+
+    //@JvmStatic and @JvmField
+    println(JvmClass.name);
 
     /*
     Class
@@ -258,7 +283,7 @@ class CompanionTest {
 }
 
 /*
-getter and setter: 自带
+getter and setter: 自带, 默认隐藏
  */
 class KotlinGetterAndSetter {
     var x: Int = 0
@@ -266,4 +291,19 @@ class KotlinGetterAndSetter {
             field = value
         }
         get() = field
+}
+
+/*
+@JvmStatic and @JvmField，主要是方便java调用
+*/
+open class JvmClass {
+    companion object {
+        @JvmField
+        val name: String = "jvm test"
+
+        @JvmStatic
+        fun method() {
+            println("call method")
+        }
+    }
 }
