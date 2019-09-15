@@ -48,30 +48,38 @@ fun main(args: Array<String>) {
 //    println(nullableString2!!.length)//!!如果为空则强制抛异常
     var nameNullable: String? = null
     var len = nameNullable?.length
-    print(len == null)
+    println(len == null)
 
     /*
     延迟初始化: lateinit var, by lazy
      */
     lateinit var lateInitByLateinit: String//lateinit var只能用来修饰类属性, 不能用来修饰局部变量和基本类型
-    //by lazy用来修饰val变量, 可以用来修饰局部变量和基本类型
+    fun testLateinit() {
+        lateInitByLateinit = "this is a lateinit string"
+    }
+    testLateinit()
+    println(lateInitByLateinit)
+    //by lazy用来修饰val变量, 可以用来修饰局部变量和基本类型，等下一次调用到的时候才会进行初始化
     val lazyByLazy: String by lazy {
         println("here is lazy init")
         "Zoo"
     }
-    println(lazyByLazy)
+    println(lazyByLazy)//lazyByLazy被调用到了，开始初始化，执行println("here is lazy init")，并且赋值"Zoo"
+
     /*
     is 判断类型
      */
     if ("kotlin" is String) {
         println("it's string")
     }
+
     /*
     as 类型转换
      */
     val y: Int? = 123;
     val x: String? = y as? String;
     println(x);
+
     /*
     函数
      */
@@ -117,7 +125,7 @@ fun main(args: Array<String>) {
     /*
     Class extends Class and Implements interface
      */
-    class SubKotlinClass(name: String) : KotlinClass(name), CallBack {
+    class SubKotlinClass(name: String) : KotlinClass(name), CallBack { //父类构造函数直接赋值, 不再调用super
         override fun getName(id: Int) {
             println("id = $id")
         }
@@ -173,6 +181,7 @@ fun main(args: Array<String>) {
     kotlinClassSecondaryConstructor1.print()
     val kotlinClassSecondaryConstructor2 = KotlinClassSecondaryConstructor("Michael", 18, true)
     kotlinClassSecondaryConstructor2.print()
+
     /*
     DataClass
      */
@@ -188,6 +197,11 @@ fun main(args: Array<String>) {
     for (name in names) {
         println("names contans:$name")
     }
+
+    for (i in 0 until names.size) {//从0一直到names.size - 1, 方便数组遍历而设计
+        println("[for until]names contans:${names[i]}")
+    }
+
     /*
     Map
      */
@@ -195,6 +209,7 @@ fun main(args: Array<String>) {
     for ((key, value) in ages) {
         println("$key -> $value")
     }
+
     /*
     可变数组
      */
@@ -202,6 +217,7 @@ fun main(args: Array<String>) {
     bags.add(4)
     println(bags.last())
     println(bags[0])
+
     /*
     while
      */
@@ -242,6 +258,45 @@ fun main(args: Array<String>) {
     val getterAndsetter = KotlinGetterAndSetter()
     getterAndsetter.x = 100
     println("getter and setter:" + getterAndsetter.x)
+
+    /*
+        内联函数
+     */
+    //let -> 闭包内使用it作为当前这个对象的参数; 返回值是函数最后一行, 或者return语句
+    fun letTest(): Int {
+        // fun <T, R> T.let(f: (T) -> R): R { f(this)}
+        "letTest".let {
+            println(it)
+            return 1
+        }
+    }
+    println(letTest())
+    //apply -> 闭包内可以任意调用此对象; 并且最终也会返回此对象
+    fun applyTest() {
+        // fun <T> T.apply(f: T.() -> Unit): T { f(); return this }
+        ArrayList<String>().apply {
+            add("applyTest")
+            println("this = $this, size = $size")
+        }.let { println(it) }
+    }
+    applyTest()
+    //with -> 闭包内可以任意调用此对象; 返回值是函数最后一行, 或者return语句
+    fun withTest() {
+        // fun <T, R> with(receiver: T, f: T.() -> R): R = receiver.f()
+        with(ArrayList<String>()) {
+            add("withTest")
+            println("this = $this, size = $size")
+        }.let { println(it) }
+    }
+    withTest()
+    //run -> run只接收一个lambda函数为参数; 返回值是函数最后一行, 或者return语句
+    fun runTest() {
+        // fun <T, R> T.run(f: T.() -> R): R = f()
+        "runTest".run {
+            println("this = " + this)
+        }.let { println(it) }
+    }
+    runTest()
 }
 
 /*
@@ -271,7 +326,7 @@ interface CallBack {
 }
 
 /*
-companion object:伴生对象
+companion object:伴生对象，相当于java中的static
 */
 class CompanionTest {
     companion object { //一个类中只能存在一个伴生对象
