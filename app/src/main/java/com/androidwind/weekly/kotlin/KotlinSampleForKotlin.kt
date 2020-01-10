@@ -1,6 +1,6 @@
 package com.androidwind.weekly.kotlin
 
-import java.math.BigInteger
+import android.os.Handler
 
 /**
  * @author  ddnosh
@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
     println(newLine)
 
     /*
-    占位符:$
+    字符串模板、占位符:$
      */
     var template = "this is a template string called $name and length is ${name.length}"
     println(template)
@@ -142,13 +142,15 @@ fun main(args: Array<String>) {
     Class with primary constructor, 主构造器定义在类头部, 因此需要init空间做初始化
      */
     class KotlinClassConstructor constructor(name: String) {
-        private val name: String
+        val name: String
 
         init {
             this.name = name
         }
     }
 
+    val kotlinClassConstructor = KotlinClassConstructor("Jack")
+    println("kotlinClassConstructor:${kotlinClassConstructor.name}")
     /*
     Class with secondary constructor, 次级构造器, 可以有多个
      */
@@ -254,11 +256,17 @@ fun main(args: Array<String>) {
     //
     println(CompanionTest.name)
     println(CompanionTest.run())
-    //
+    //getter and setter
     val getterAndsetter = KotlinGetterAndSetter()
     getterAndsetter.x = 100
     println("getter and setter:" + getterAndsetter.x)
-
+    //getter and setter 二次赋值
+    val person = Person()
+    println("name:${person.name}")
+    person.name = "hello world"
+    println("name:${person.name}")
+    person.age = -1
+    println("name:${person.age}")
     /*
         内联函数
      */
@@ -280,6 +288,13 @@ fun main(args: Array<String>) {
         }.let { println(it) }
     }
     applyTest()
+    //  apply with null and nonnull
+    val strJim: String? = null
+    strJim?.apply {
+        println("apply with nonnull")
+    } ?: strJim.apply {
+        println("apply with null")
+    }
     //with -> 闭包内可以任意调用此对象; 返回值是函数最后一行, 或者return语句
     fun withTest() {
         // fun <T, R> with(receiver: T, f: T.() -> R): R = receiver.f()
@@ -297,6 +312,15 @@ fun main(args: Array<String>) {
         }.let { println(it) }
     }
     runTest()
+    //test anonymous inner class about interface
+    callback.getName(123)
+}
+
+//new a interface
+private val callback = object : CallBack {
+    override fun getName(id: Int) {
+        println("CallBack -> getName")
+    }
 }
 
 /*
@@ -344,6 +368,24 @@ class KotlinGetterAndSetter {
     var x: Int = 0
         set(value) {
             field = value
+        }
+        get() = field
+}
+
+class Person {
+    var name: String = "Tom"
+        set(value) {
+            field = value
+        }
+        get() = field.toUpperCase()
+
+    var age: Int = 100
+        set(value) {
+            if (value < 0) {
+                field = 0
+            } else {
+                field = value
+            }
         }
         get() = field
 }
