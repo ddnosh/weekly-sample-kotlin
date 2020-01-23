@@ -314,6 +314,11 @@ fun main(args: Array<String>) {
     runTest()
     //test anonymous inner class about interface
     callback.getName(123)
+    //@JvmOverloads, 声明多个参数的构造函数
+    val animal = Animal()
+    animal.func("dog")
+    animal.func("dog", 2)
+    animal.func("dog", 2, "New York")
 }
 
 //new a interface
@@ -402,5 +407,12 @@ open class JvmClass {
         fun method() {
             println("call method")
         }
+    }
+}
+
+class Animal {
+    //define multiple constructor
+    @JvmOverloads
+    fun func(a: String, b: Int = 0, c: String = "abc") {
     }
 }

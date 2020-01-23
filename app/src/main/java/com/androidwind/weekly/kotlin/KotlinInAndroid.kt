@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_main.*
  * @author  ddnosh
  * @website http://blog.csdn.net/ddnosh
  */
-class KotlinSampleForAndroid : AppCompatActivity() {
+class KotlinInAndroid : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
