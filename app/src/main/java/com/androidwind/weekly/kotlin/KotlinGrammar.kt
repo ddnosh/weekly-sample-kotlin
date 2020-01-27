@@ -267,9 +267,14 @@ fun main(args: Array<String>) {
     println("name:${person.name}")
     person.age = -1
     println("name:${person.age}")
-    /*
-        内联函数
-     */
+
+    /* 内联函数
+                apply	            let	                run	                with	            also
+    函数体对象	this	            it	                this	            this	            it
+    对象是否可省	可	                不可	            可	                可	                不可
+    返回值	    必有,当前对象	    最后一行,可有可无   	最后一行,可有可无	    最后一行,可有可无	    必有,当前对象
+    可否判空	    可以	            可以	            可以	            不可以	            可以
+    */
     //let -> 闭包内使用it作为当前这个对象的参数; 返回值是函数最后一行, 或者return语句
     fun letTest(): Int {
         // fun <T, R> T.let(f: (T) -> R): R { f(this)}
@@ -312,6 +317,15 @@ fun main(args: Array<String>) {
         }.let { println(it) }
     }
     runTest()
+    //also
+    fun alsoTest() {
+        val car = Car("Benz")
+        car.also {
+            it.name = "BMW"
+        }
+        println("car's name is ${car.name}")
+    }
+    alsoTest()
     //test anonymous inner class about interface
     callback.getName(123)
     //@JvmOverloads, 声明多个参数的构造函数
@@ -396,7 +410,7 @@ class Person {
 }
 
 /*
-@JvmStatic and @JvmField，主要是方便java调用
+@JvmStatic and @JvmField，主要是方便java调用，不用再在java中写.INSTANCE调用kotlin代码
 */
 open class JvmClass {
     companion object {
@@ -415,4 +429,8 @@ class Animal {
     @JvmOverloads
     fun func(a: String, b: Int = 0, c: String = "abc") {
     }
+}
+
+class Car(var name: String) {
+
 }
