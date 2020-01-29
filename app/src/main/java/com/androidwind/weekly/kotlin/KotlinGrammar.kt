@@ -98,7 +98,7 @@ fun main(args: Array<String>) {
     println(method3("kotlin3"))
 
     //void返回类型
-    fun testVoid(): Unit {
+    fun testVoid(): Unit {//Unit = java's void
         println("this is a void fun")
     }
 
@@ -117,6 +117,12 @@ fun main(args: Array<String>) {
 
     //@JvmStatic and @JvmField
     println(JvmClass.name);
+
+    //方法入参可以指定默认值
+    fun sayHello(who: String = "Chall", msg: String = "Hello") {
+        println("$who - said - $msg")
+    }
+    sayHello()
 
     /*
     Class
