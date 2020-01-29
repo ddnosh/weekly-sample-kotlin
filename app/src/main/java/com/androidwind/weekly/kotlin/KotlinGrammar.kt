@@ -97,6 +97,15 @@ fun main(args: Array<String>) {
     println(method2("kotlin2"))
     println(method3("kotlin3"))
 
+    //void返回类型
+    fun testVoid(): Unit {
+        println("this is a void fun")
+    }
+
+    fun testVoidWithoutUnit() {
+        println("this is a void fun without unit")
+    }
+
     fun methodWithMultipleArgs(vararg name: String) {//多个参数
         println("params size is ${name.size}")
     }
@@ -141,7 +150,7 @@ fun main(args: Array<String>) {
     /*
     Class with primary constructor, 主构造器定义在类头部, 因此需要init空间做初始化
      */
-    class KotlinClassConstructor constructor(name: String) {
+    class KotlinClassConstructor1 constructor(name: String) {
         val name: String
 
         init {
@@ -149,8 +158,32 @@ fun main(args: Array<String>) {
         }
     }
 
-    val kotlinClassConstructor = KotlinClassConstructor("Jack")
-    println("kotlinClassConstructor:${kotlinClassConstructor.name}")
+    val kotlinClassConstructor1 = KotlinClassConstructor1("Jack")
+    println("kotlinClassConstructor:${kotlinClassConstructor1.name}")
+
+    /*
+    Class with primary constructor, 主构造器定义在类头部, 也可以在类的属性初始化声明处
+     */
+    class KotlinClassConstructor2 constructor(name: String) {
+        val prop: String = name.toUpperCase()
+    }
+
+    /*
+    Class with primary constructor, 如果主构造函数没有注解或可见性说明，则 constructor 关键字可以省略
+     */
+    class KotlinClassConstructor3(name: String) {
+
+    }
+
+    /*
+    Class with primary constructor, 声明属性并在主构造函数中初始化更简洁的写法
+     */
+    class KotlinClassConstructor4(var name: String) {
+
+    }
+
+    val kotlinClassConstructor4 = KotlinClassConstructor4("Jack")
+    println("kotlinClassConstructor:${kotlinClassConstructor4.name}")
     /*
     Class with secondary constructor, 次级构造器, 可以有多个
      */
@@ -333,6 +366,17 @@ fun main(args: Array<String>) {
     animal.func("dog")
     animal.func("dog", 2)
     animal.func("dog", 2, "New York")
+    //lambda
+    val lambdaTest1 = LambdaTest1()
+    lambdaTest1.setTheCallBack(object : CallBack {
+        override fun getName(id: Int) {
+            println("getName")
+        }
+    })
+    val lambdaTest2 = LambdaTest2()
+    lambdaTest2.setTheCallBack({ id -> println("getName") })
+    lambdaTest2.setTheCallBack { id -> println("getName") }
+    lambdaTest2.setTheCallBack { println("getName") }
 }
 
 //new a interface
@@ -433,4 +477,18 @@ class Animal {
 
 class Car(var name: String) {
 
+}
+
+class LambdaTest1 {
+    var callback: CallBack? = null
+    fun setTheCallBack(callback: CallBack) {
+        this.callback = callback
+    }
+}
+
+class LambdaTest2 {
+    lateinit var callback: (CallBack) -> Unit
+    fun setTheCallBack(callback: (CallBack) -> Unit) {
+        this.callback = callback
+    }
 }
