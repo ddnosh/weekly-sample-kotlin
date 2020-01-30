@@ -1,5 +1,7 @@
 package com.androidwind.weekly.kotlin
 
+import kotlin.reflect.KProperty
+
 /**
  * @author  ddnosh
  * @website http://blog.csdn.net/ddnosh
@@ -53,7 +55,10 @@ fun main(args: Array<String>) {
     Derived(b).otherPrint() //输出other
 
     //3. 属性委托
-
+    val isLogin: Boolean by DerivedProperty("tom")
+    if (isLogin) {
+        println("this is a property when invoked")
+    }
 }
 
 class Test {
@@ -78,4 +83,12 @@ class Derived(b: Base) : Base by b {
     fun otherPrint() {
         println("other")
     }
+}
+
+class DerivedProperty<T>(val name: String) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        println("this is a property delegate")
+        return true as T
+    }
+
 }

@@ -32,8 +32,4 @@ class KotlinInAndroid : AppCompatActivity() {
     fun ImageView.loadUrl(url: String) {//在任何类上添加函数
         Glide.with(iv_1.getContext()).load(url).into(iv_1)
     }
-
-    fun Context.toast(message: CharSequence, duration: Int = Toast.LENGTH_SHORT) {
-        Toast.makeText(this, message, duration).show()
-    }
 }
