@@ -1,5 +1,8 @@
 package com.androidwind.weekly.kotlin
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.reflect.KProperty
 
 /**
@@ -59,6 +62,15 @@ fun main(args: Array<String>) {
     if (isLogin) {
         println("this is a property when invoked")
     }
+
+    //4. 协程
+    GlobalScope.launch {
+        delay(1000)
+        print("World")
+    }
+    print("Hello ")
+    Thread.sleep(2000)
+    print("!")
 }
 
 class Test {
