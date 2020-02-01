@@ -84,7 +84,7 @@ interface Base {
 }
 
 // 实现此接口的委托类
-class BaseImpl(val x: Int) : Base {
+class BaseImpl(private val x: Int) : Base {
     override fun print() {
         println(x)
     }
@@ -97,9 +97,15 @@ class Derived(b: Base) : Base by b {
     }
 }
 
-class DerivedProperty<T>(val name: String) {
+class DerivedProperty<T>(private val name: String) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        println("this is a property delegate")
+        println("this is a property delegate: $name")
+        when (name) {
+            "tom" -> return true as T
+            "jerry" -> return false as T
+            else -> return false as T
+        }
+
         return true as T
     }
 

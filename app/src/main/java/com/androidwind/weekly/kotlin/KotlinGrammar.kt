@@ -224,6 +224,11 @@ fun main(args: Array<String>) {
     kotlinClassSecondaryConstructor2.print()
 
     /*
+    class withour body
+     */
+    class withoutBody
+
+    /*
     DataClass
      */
     data class DataClassSample(val x: Int, val y: Int)
@@ -383,6 +388,9 @@ fun main(args: Array<String>) {
     lambdaTest2.setTheCallBack({ id -> println("getName") })
     lambdaTest2.setTheCallBack { id -> println("getName") }
     lambdaTest2.setTheCallBack { println("getName") }
+    //lambda使用下划线_, 没有用到的就用_代替
+    val aa = mapOf(1 to "a", 2 to "B")
+    aa.forEach { (_, value) -> println("value:$value") }
 }
 
 //new a interface
