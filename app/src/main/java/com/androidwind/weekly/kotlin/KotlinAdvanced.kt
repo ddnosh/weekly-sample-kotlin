@@ -12,31 +12,74 @@ import kotlin.reflect.KProperty
 
 fun main(args: Array<String>) {
 
-    //1. 函数作为参数传递: T.()->Unit 和 ()->Unit
+    //1. 函数作为参数传递, 可以用作回调: T.()->Unit 和 ()->Unit
     //() -> Unit//表示无参数无返回值的Lambda表达式类型
     //(T) -> Unit//表示接收一个T类型参数，无返回值的Lambda表达式类型
     //(T) -> R//表示接收一个T类型参数，返回一个R类型值的Lambda表达式类型
 
     //()->Unit
-    fun logFun(msg1: String, msg2: String): Int {
-        println("----->msg:${msg1},${msg2}----")
-        return 1;
+    //1.1 不带参数和返回值的函数作为形参
+    fun action0(method: () -> Unit) {
+        method()
+        println("this is action0")
+    }
+
+    fun method0() {
+        println("this is method0 which is invoked")
+    }
+
+    //format->step1
+    action0({
+        println("this is action0")
+    })
+    //format->step2
+    action0() {
+        println("this is action0")
+    }
+    //format->step3
+    action0 {
+        println("this is action0")
+    }
+
+    fun action1(first: Int, method: () -> Unit) {
+        method()
+        println("this is action1")
+    }
+
+    //format->step1
+    action1(1, {
+        println("第1种写法")
+    })
+    //format->step2
+    action1(1) {
+        println("第2种写法")
+    }
+
+    val method: () -> Unit = {
+        println("第3种写法")
+    }
+    action1(1, method)
+
+    //1.2 带参数和返回值的函数作为形参
+    fun method1(msg1: Int, msg2: Int): Int {
+        println("this is method1")
+        return msg1 + msg2;
     }
 
     fun getResult1(
-        arg01: String,
-        arg02: String,
-        method: (arg1: String, arg2: String) -> Int
+        arg01: Int,
+        arg02: Int,
+        method: (arg1: Int, arg2: Int) -> Int
     ) {
         println("----->msg:before")
         val ret = method(arg01, arg02);
         println("----->msg:after = $ret")
     }
 
-    println(getResult1("参数1", "参数2", ::logFun))
+    println(getResult1(1, 2, ::method1))
 
     //T.()->Unit
-    fun getResult2(
+    fun getResult3(
         method: Test.() -> Unit
     ) {
         println("----->msg:before")
@@ -46,7 +89,7 @@ fun main(args: Array<String>) {
     }
 
     println(
-        getResult2(
+        getResult3(
             {
                 a = "Tim"
             })

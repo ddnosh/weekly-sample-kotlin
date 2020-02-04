@@ -385,9 +385,9 @@ fun main(args: Array<String>) {
         }
     })
     val lambdaTest2 = LambdaTest2()
-    lambdaTest2.setTheCallBack({ id -> println("getName") })
-    lambdaTest2.setTheCallBack { id -> println("getName") }
-    lambdaTest2.setTheCallBack { println("getName") }
+    lambdaTest2.setCallBack({ id -> println("getName") })
+    lambdaTest2.setCallBack { id -> println("getName") }
+    lambdaTest2.setCallBack { println("getName") }
     //lambda使用下划线_, 没有用到的就用_代替
     val aa = mapOf(1 to "a", 2 to "B")
     aa.forEach { (_, value) -> println("value:$value") }
@@ -502,7 +502,7 @@ class LambdaTest1 {
 
 class LambdaTest2 {
     lateinit var callback: (CallBack) -> Unit
-    fun setTheCallBack(callback: (CallBack) -> Unit) {
+    fun setCallBack(callback: (CallBack) -> Unit) {
         this.callback = callback
     }
 }

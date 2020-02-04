@@ -20,6 +20,12 @@ class KotlinInAndroid : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //1. 控件直接用id, 不再使用findviewbyid
+        btn_1.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                toastMe()
+            }
+
+        })
         btn_1.setOnClickListener { toastMe() } //lambda表达式更加简洁
         //2. 控件自定义方法
         iv_1.loadUrl("https://www.baidu.com/img/bd_logo1.png")
