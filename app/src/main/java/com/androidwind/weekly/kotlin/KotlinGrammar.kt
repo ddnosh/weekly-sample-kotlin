@@ -377,7 +377,7 @@ fun main(args: Array<String>) {
     animal.func("dog")
     animal.func("dog", 2)
     animal.func("dog", 2, "New York")
-    //lambda
+    //lambda表达式
     val lambdaTest1 = LambdaTest1()
     lambdaTest1.setTheCallBack(object : CallBack {
         override fun getName(id: Int) {
@@ -505,4 +505,8 @@ class LambdaTest2 {
     fun setCallBack(callback: (CallBack) -> Unit) {
         this.callback = callback
     }
+}
+
+class User(var name: String, var age: Int) {
+
 }

@@ -12,13 +12,46 @@ import kotlin.reflect.KProperty
 
 fun main(args: Array<String>) {
 
-    //1. 函数作为参数传递, 可以用作回调: T.()->Unit 和 ()->Unit
+    //1. lambda表达式
+    //kotlin中lambda表达式定义在{}中
+    val l = { x: Int, y: String -> y.length + x }
+    //lambda表达式可以直接通过run运行
+    run { l(1, "tom") }
+    //lambda简化过程
+    val people = listOf(User("张三", 18), User("李四", 20))
+    //1.1 函数只有lambda一个实参
+    //原始完整代码
+    println("年纪最大:" + people.maxBy({ user: User -> user.age }))
+    //step1:如果lambda表达式是函数调用的最后一个实参，它可以放在括号外面
+    println("年纪最大:" + people.maxBy() { user: User -> user.age })
+    //step2： 当lambda是函数唯一的实参时，可以去掉函数调用的括号
+    println("年纪最大:" + people.maxBy { user: User -> user.age })
+    //step3：如果lambda的参数的类型可以推导，那么可以省略参数的类型
+    println("年纪最大:" + people.maxBy { user -> user.age })
+    //step4：对于lambda中一个参数时，可以使用默认参数名称it来代替命名参数，并且lambda的参数列表可以简化，省略参数列表和->
+    println("年纪最大:" + people.maxBy { it.age })
+    //1.2 函数有除了lambda外多个实参
+    fun lambdaTest1(a: Int, b: (String) -> String) {
+        println("$a + ${b(a.toString())}")
+    }
+
+    fun lambdaTest2(b: (String) -> String, a: Int) {
+        println("$a + ${b(a.toString())}")
+    }
+
+    lambdaTest1(11) {
+        "hello: $it"
+    }
+
+    lambdaTest2({ "hello: $it" }, 22)
+
+    //2. 函数作为参数传递, 可以用作回调: T.()->Unit 和 ()->Unit
     //() -> Unit//表示无参数无返回值的Lambda表达式类型
     //(T) -> Unit//表示接收一个T类型参数，无返回值的Lambda表达式类型
     //(T) -> R//表示接收一个T类型参数，返回一个R类型值的Lambda表达式类型
 
     //()->Unit
-    //1.1 不带参数和返回值的函数作为形参
+    //2.1 不带参数和返回值的函数作为形参
     fun action0(method: () -> Unit) {
         method()
         println("this is action0")
@@ -28,15 +61,6 @@ fun main(args: Array<String>) {
         println("this is method0 which is invoked")
     }
 
-    //format->step1
-    action0({
-        println("this is action0")
-    })
-    //format->step2
-    action0() {
-        println("this is action0")
-    }
-    //format->step3
     action0 {
         println("this is action0")
     }
@@ -60,7 +84,7 @@ fun main(args: Array<String>) {
     }
     action1(1, method)
 
-    //1.2 带参数和返回值的函数作为形参
+    //2.2 带参数和返回值的函数作为形参
     fun method1(msg1: Int, msg2: Int): Int {
         println("this is method1")
         return msg1 + msg2;
@@ -95,18 +119,18 @@ fun main(args: Array<String>) {
             })
     )
 
-    //2. 类委托
+    //3. 类委托
     val b = BaseImpl(10)
     Derived(b).print() // 输出 10
     Derived(b).otherPrint() //输出other
 
-    //3. 属性委托
+    //4. 属性委托
     val isLogin: Boolean by DerivedProperty("tom")
     if (isLogin) {
         println("this is a property when invoked")
     }
 
-    //4. 协程
+    //5. 协程
     GlobalScope.launch {
         delay(1000)
         print("World")
