@@ -72,6 +72,8 @@ class KotlinInAndroid : AppCompatActivity() {
             println(text1.await() + text2.await())
             println("[way3]耗时：" + (System.currentTimeMillis() - startTime))
         }
+        //5. set赋值, text替换setText
+        btn_1.text = "click me......"
     }
 
     private fun toastMe() {

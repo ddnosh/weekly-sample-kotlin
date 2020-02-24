@@ -361,6 +361,13 @@ fun main(args: Array<String>) {
         }.let { println(it) }
     }
     runTest()
+    //run用来判空
+    val s = null
+    s?.run {
+
+    } ?: run {
+        println("use run to identify null")
+    }
     //also
     fun alsoTest() {
         val car = Car("Benz")
