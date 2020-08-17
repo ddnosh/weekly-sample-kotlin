@@ -45,6 +45,13 @@ fun main(args: Array<String>) {
 
     lambdaTest2({ "hello: $it" }, 22)
 
+    //定义匿名函数，赋值给test变量
+    var test = fun(x: Int, y: Int): Int {
+        return x + y
+    }
+    //通过test调用匿名函数
+    println(test(2, 4))
+
     //2. 函数作为参数传递, 可以用作回调: T.()->Unit 和 ()->Unit
     //() -> Unit//表示无参数无返回值的Lambda表达式类型
     //(T) -> Unit//表示接收一个T类型参数，无返回值的Lambda表达式类型
