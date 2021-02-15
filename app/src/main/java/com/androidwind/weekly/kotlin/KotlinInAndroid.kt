@@ -72,6 +72,12 @@ class KotlinInAndroid : AppCompatActivity() {
             println(text1.await() + text2.await())
             println("[way3]耗时：" + (System.currentTimeMillis() - startTime))
         }
+        //way4:
+        GlobalScope.launch(Dispatchers.Main) {
+            var name = getResultFromNet()
+            showResult(name)
+        }
+
         //5. set赋值, text替换setText
         btn_1.text = "click me......"
     }
@@ -98,5 +104,21 @@ class KotlinInAndroid : AppCompatActivity() {
             delay(1000)
             "World!"
         }
+    }
+
+    private suspend fun getResultFromNet(): String {
+        var name = ""
+        withContext(Dispatchers.IO) {
+            for (i in 0..1000000) {
+                //这里模拟一个耗时操作
+            }
+
+            name = "ddnosh"
+        }
+        return name
+    }
+
+    private fun showResult(result: String) {
+        println("[way4]=$result")
     }
 }

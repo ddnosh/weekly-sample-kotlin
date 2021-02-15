@@ -398,6 +398,18 @@ fun main(args: Array<String>) {
     //lambda使用下划线_, 没有用到的就用_代替
     val aa = mapOf(1 to "a", 2 to "B")
     aa.forEach { (_, value) -> println("value:$value") }
+
+    /*
+    chain use
+     */
+    var list = arrayOf("java", "c++", "Android", "Kotlin", "iOS")
+    list.map {
+        "Hello $it"
+    }.filter {
+        !it.contains("c")
+    }.forEach {
+        println(it)
+    }
 }
 
 //new a interface
@@ -431,6 +443,12 @@ Interface
 */
 interface CallBack {
     fun getName(id: Int)
+}
+
+interface CallBack2 {
+    fun getName(id: Int)
+
+    fun getVersion() = 1 // can offer non-abstract method
 }
 
 /*

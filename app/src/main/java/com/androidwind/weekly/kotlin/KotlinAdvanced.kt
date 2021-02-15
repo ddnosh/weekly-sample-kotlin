@@ -1,11 +1,14 @@
 package com.androidwind.weekly.kotlin
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.reflect.KProperty
 
 /**
+ * Kotlin语法糖
+ *
  * @author  ddnosh
  * @website http://blog.csdn.net/ddnosh
  */
@@ -13,10 +16,28 @@ import kotlin.reflect.KProperty
 fun main(args: Array<String>) {
 
     //1. lambda表达式
-    //kotlin中lambda表达式定义在{}中
-    val l = { x: Int, y: String -> y.length + x }
+    //(1) kotlin中lambda表达式定义在{}中
+    //(2) 其参数(如果存在)在 -> 之前声明(参数类型可以省略)
+    //(3) 函数体(如果存在)在 -> 后面
+
+    //源代码：无参
+    fun l1() {
+        println("无参数")
+    }
+    //lambda
+    val l1 = { println("无参数") }
+    //调用
+    l1()
+    //源代码：有参
+    fun l2(x: Int, y: String) {
+        println(y.length + x)
+    }
+    //lambda
+    val l2 = { x: Int, y: String -> println(y.length + x) }
+    //调用
+    l2(1, "Mike")
     //lambda表达式可以直接通过run运行
-    run { l(1, "tom") }
+    run { l2(1, "tom") }
     //lambda简化过程
     val people = listOf(User("张三", 18), User("李四", 20))
     //1.1 函数只有lambda一个实参
@@ -144,7 +165,30 @@ fun main(args: Array<String>) {
     }
     print("Hello ")
     Thread.sleep(2000)
-    print("!")
+    print("!\n")
+    //指定运行在主线程中
+    GlobalScope.launch(Dispatchers.Main) { println(Thread.currentThread().name) }
+
+    //6. 扩展函数
+    fun ExtClass.foo() = println("ext") // when the same as the member foo
+    fun ExtClass.foo(para: Int) = println("ext")
+
+    ExtClass().foo()
+    ExtClass().foo(0)
+    //7. 闭包：函数中包含函数
+    val plus = { x: Int, y: Int -> println("$x plus $y is ${x + y}") }
+    val hello = { println("Hello Kotlin") }
+    fun closure(args: Array<String>) {
+        { x: Int, y: Int ->
+            println("$x plus $y is ${x + y}")
+        }(2, 8)         // 自执行的闭包
+        plus(2, 8)
+        hello()
+    }
+}
+
+class ExtClass {
+    fun foo() = println("origin")
 }
 
 class Test {
