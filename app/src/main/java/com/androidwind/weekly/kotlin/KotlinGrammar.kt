@@ -1,6 +1,8 @@
 package com.androidwind.weekly.kotlin
 
 import android.os.Handler
+import com.androidwind.weekly.kotlin.other.CallBack
+import com.androidwind.weekly.kotlin.other.CallBackFromJava
 
 /**
  * @author  ddnosh
@@ -83,19 +85,29 @@ fun main(args: Array<String>) {
     /*
     函数
      */
-    fun method1(name: String): String {//单个参数
+    //step1: 标准写法
+    fun method1(name: String): String {
         return "hello $name"
     }
 
+    //step2: 如果返回值类型可以由编译器推断出来，则可以省略返回值类型
     fun method2(name: String) = {
         "hello $name"
     }
 
+    //step3: 函数只有单个表达式，则可以省略花括号，直接写在=后
     fun method3(name: String) = "hello $name"
+
+    //step4: 具有代码块的函数，必须显示指明返回类型
+    fun method4(): Int {
+        println("this is 100")
+        return 100
+    }
 
     println(method1("kotlin1"))
     println(method2("kotlin2"))
     println(method3("kotlin3"))
+    println(method4())
 
     //void返回类型
     fun testVoid(): Unit {//Unit = java's void
@@ -391,6 +403,10 @@ fun main(args: Array<String>) {
             println("getName")
         }
     })
+    //if the callback defined in java
+    lambdaTest1.setTheCallBackFromJava(CallBackFromJava {
+        println("getName")
+    })
     val lambdaTest2 = LambdaTest2()
     lambdaTest2.setCallBack({ id -> println("getName") })
     lambdaTest2.setCallBack { id -> println("getName") }
@@ -441,9 +457,9 @@ object Utils2 {
 /*
 Interface
 */
-interface CallBack {
-    fun getName(id: Int)
-}
+//interface CallBack {
+//    fun getName(id: Int)
+//}
 
 interface CallBack2 {
     fun getName(id: Int)
@@ -520,8 +536,13 @@ class Car(var name: String) {
 
 class LambdaTest1 {
     var callback: CallBack? = null
+    var callbackfromjava: CallBackFromJava<Any>? = null
     fun setTheCallBack(callback: CallBack) {
         this.callback = callback
+    }
+
+    fun setTheCallBackFromJava(callbackfromjava: CallBackFromJava<Any>) {
+        this.callbackfromjava = callbackfromjava
     }
 }
 

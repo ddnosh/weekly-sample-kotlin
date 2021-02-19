@@ -1,9 +1,16 @@
 package com.androidwind.weekly.kotlin
 
+import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.*
+import java.util.concurrent.TimeoutException
 import kotlin.reflect.KProperty
 
 /**
@@ -15,7 +22,9 @@ import kotlin.reflect.KProperty
 
 fun main(args: Array<String>) {
 
-    //1. lambda表达式
+    /*
+    1. lambda表达式
+     */
     //(1) kotlin中lambda表达式定义在{}中
     //(2) 其参数(如果存在)在 -> 之前声明(参数类型可以省略)
     //(3) 函数体(如果存在)在 -> 后面
@@ -24,7 +33,7 @@ fun main(args: Array<String>) {
     fun l1() {
         println("无参数")
     }
-    //lambda
+    //lambda表达式: 以值的形式传递
     val l1 = { println("无参数") }
     //调用
     l1()
@@ -32,12 +41,13 @@ fun main(args: Array<String>) {
     fun l2(x: Int, y: String) {
         println(y.length + x)
     }
-    //lambda
+    //lambda表达式: 以值的形式传递
     val l2 = { x: Int, y: String -> println(y.length + x) }
     //调用
     l2(1, "Mike")
     //lambda表达式可以直接通过run运行
     run { l2(1, "tom") }
+
     //lambda简化过程
     val people = listOf(User("张三", 18), User("李四", 20))
     //1.1 函数只有lambda一个实参
@@ -73,7 +83,10 @@ fun main(args: Array<String>) {
     //通过test调用匿名函数
     println(test(2, 4))
 
-    //2. 函数作为参数传递, 可以用作回调: T.()->Unit 和 ()->Unit
+    /*
+    2. 函数作为参数传递, 可以用作回调: T.()->Unit 和 ()->Unit
+     */
+
     //() -> Unit//表示无参数无返回值的Lambda表达式类型
     //(T) -> Unit//表示接收一个T类型参数，无返回值的Lambda表达式类型
     //(T) -> R//表示接收一个T类型参数，返回一个R类型值的Lambda表达式类型
@@ -147,29 +160,73 @@ fun main(args: Array<String>) {
             })
     )
 
-    //3. 类委托
+    /*
+    3. 类委托
+     */
     val b = BaseImpl(10)
     Derived(b).print() // 输出 10
     Derived(b).otherPrint() //输出other
 
-    //4. 属性委托
+    /*
+    4. 属性委托
+     */
     val isLogin: Boolean by DerivedProperty("tom")
     if (isLogin) {
         println("this is a property when invoked")
     }
 
-    //5. 协程
+    /*
+    5. 协程
+     */
+    /*(1)
+    RxJava和协程的区别
+     */
+    fun getUser(): Observable<String> {
+        val random = Random()
+        return Observable
+            .create { emitter: ObservableEmitter<String> ->
+                //模拟网络请求
+                println("I'm doing network,CurrentThread is " + Thread.currentThread().name + "...")
+                Thread.sleep(1000)
+                if (random.nextBoolean()) {
+                    emitter.onNext("Jack")
+                } else {
+                    emitter.onError(TimeoutException("Net Error!"))
+                }
+            }
+            .subscribeOn(Schedulers.io())//指定网络请求在IO线程
+    }
+
+    fun main() {
+        getUser()
+            .subscribe(Consumer {
+                println(it)
+            })
+        Thread.sleep(1000)//延时3s,避免主线程销毁
+    }
+    //run
+    main()
+
+    /*(2)
+     launch是非阻塞的, runBlocking是阻塞的;
+     withContext与async都可以返回耗时任务的执行结果;
+     多个withContext任务是串行的, withContext可直接返回耗时任务的结果;
+     多个async任务是并行的, async返回的是一个Deferred<T>, 需要调用其await()方法获取结果;
+     */
+    //GlobalScope表示此协程的生命周期随应用程序的生命周期
     GlobalScope.launch {
         delay(1000)
-        print("World")
+        print("runs in ${Thread.currentThread().name} ")
     }
     print("Hello ")
     Thread.sleep(2000)
     print("!\n")
     //指定运行在主线程中
-    GlobalScope.launch(Dispatchers.Main) { println(Thread.currentThread().name) }
+//    GlobalScope.launch(Dispatchers.Main) { println(Thread.currentThread().name) }
 
-    //6. 扩展函数
+    /*
+    6. 扩展函数
+     */
     fun ExtClass.foo() = println("ext") // when the same as the member foo
     fun ExtClass.foo(para: Int) = println("ext")
 
@@ -185,6 +242,8 @@ fun main(args: Array<String>) {
         plus(2, 8)
         hello()
     }
+    //7. 替代RxJava的骚操作
+
 }
 
 class ExtClass {
