@@ -1,14 +1,14 @@
 package com.androidwind.weekly.kotlin
 
+import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.TimeoutException
 import kotlin.reflect.KProperty
@@ -132,9 +132,9 @@ fun main(args: Array<String>) {
     }
 
     fun getResult1(
-        arg01: Int,
-        arg02: Int,
-        method: (arg1: Int, arg2: Int) -> Int
+            arg01: Int,
+            arg02: Int,
+            method: (arg1: Int, arg2: Int) -> Int
     ) {
         println("----->msg:before")
         val ret = method(arg01, arg02);
@@ -145,7 +145,7 @@ fun main(args: Array<String>) {
 
     //T.()->Unit
     fun getResult3(
-        method: Test.() -> Unit
+            method: Test.() -> Unit
     ) {
         println("----->msg:before")
         val test1 = Test()
@@ -154,21 +154,40 @@ fun main(args: Array<String>) {
     }
 
     println(
-        getResult3(
-            {
-                a = "Tim"
-            })
+            getResult3(
+                    {
+                        a = "Tim"
+                    })
     )
 
+    //2.3 函数作为参数, 指定加载位置和时机
+    var host = false
+    fun isHost() = host
+    suspend fun getFromNet() {
+        withContext(Dispatchers.IO) {
+            delay(1000)
+            host = true
+        }
+    }
+
+    fun load(checkHost: () -> Boolean) {
+        GlobalScope.launch() {
+            getFromNet()
+            if (checkHost.invoke()) println("yes, it's the host") else print("no, it's not the host")
+        }
+    }
+
+    load { isHost() }
+
     /*
-    3. 类委托
+    3.1 类委托
      */
     val b = BaseImpl(10)
     Derived(b).print() // 输出 10
     Derived(b).otherPrint() //输出other
 
     /*
-    4. 属性委托
+    3.2 属性委托
      */
     val isLogin: Boolean by DerivedProperty("tom")
     if (isLogin) {
@@ -176,63 +195,132 @@ fun main(args: Array<String>) {
     }
 
     /*
-    5. 协程
+    4. 协程
      */
-    /*(1)
-    RxJava和协程的区别
-     */
+    // 4.1 RxJava和协程的区别
     fun getUser(): Observable<String> {
         val random = Random()
         return Observable
-            .create { emitter: ObservableEmitter<String> ->
-                //模拟网络请求
-                println("I'm doing network,CurrentThread is " + Thread.currentThread().name + "...")
-                Thread.sleep(1000)
-                if (random.nextBoolean()) {
-                    emitter.onNext("Jack")
-                } else {
-                    emitter.onError(TimeoutException("Net Error!"))
+                .create { emitter: ObservableEmitter<String> ->
+                    //模拟网络请求
+                    println("I'm doing network,CurrentThread is " + Thread.currentThread().name + "...")
+                    Thread.sleep(1000)
+                    if (random.nextBoolean()) {
+                        emitter.onNext("Jack")
+                    } else {
+                        emitter.onError(TimeoutException("Net Error!"))
+                    }
                 }
-            }
-            .subscribeOn(Schedulers.io())//指定网络请求在IO线程
+                .subscribeOn(Schedulers.io())//指定网络请求在IO线程
     }
 
-    fun main() {
+    fun rxjava() {
         getUser()
-            .subscribe(Consumer {
-                println(it)
-            })
-        Thread.sleep(1000)//延时3s,避免主线程销毁
+                .subscribe(object : Observer<String> {
+                    override fun onComplete() {
+                    }
+
+                    override fun onSubscribe(d: Disposable) {
+                    }
+
+                    override fun onNext(t: String) {
+                        println(t)
+                    }
+
+                    override fun onError(e: Throwable) {
+                    }
+
+                })
+        Thread.sleep(2000)//延时2s,避免主线程销毁
     }
     //run
-    main()
+    rxjava()
 
-    /*(2)
-     launch是非阻塞的, runBlocking是阻塞的;
-     withContext与async都可以返回耗时任务的执行结果;
-     多个withContext任务是串行的, withContext可直接返回耗时任务的结果;
-     多个async任务是并行的, async返回的是一个Deferred<T>, 需要调用其await()方法获取结果;
+    /* 4.2
+     1. 可在全局创建协程: launch和runBlocking
+     (1)launch是非阻塞的;
+     (2)runBlocking是阻塞的;
+     2. 可返回结果的协程: withContext和async
+     (1)withContext与async都可以返回耗时任务的执行结果;
+     (2)多个withContext任务是串行的, withContext可直接返回耗时任务的结果;
+     (3)多个async任务是并行的, async返回的是一个Deferred<T>, 需要调用其await()方法获取结果;
      */
-    //GlobalScope表示此协程的生命周期随应用程序的生命周期
+    //4.2.1.1: launch
     GlobalScope.launch {
         delay(1000)
-        print("runs in ${Thread.currentThread().name} ")
+        println("1.执行launch, [当前线程为：${Thread.currentThread().name}]")
     }
-    print("Hello ")
-    Thread.sleep(2000)
-    print("!\n")
+    println("2.Run launch, [当前线程为：${Thread.currentThread().name}]")
     //指定运行在主线程中
 //    GlobalScope.launch(Dispatchers.Main) { println(Thread.currentThread().name) }
 
+    //4.2.1.2: runBlocking
+    runBlocking {
+        delay(500)    //延时500ms
+        println("1.执行runBlocking, [当前线程为：${Thread.currentThread().name}]")
+    }
+    println("2.Run runBlocking, [当前线程为：${Thread.currentThread().name}]")
+
+    //4.2.2.1: withContext
+    GlobalScope.launch {
+        val time1 = System.currentTimeMillis()
+
+        val task1 = withContext(Dispatchers.IO) {
+            delay(2000)
+            println("1.执行withContext-task1.... [当前线程为：${Thread.currentThread().name}]")
+            "one"  //返回结果赋值给task1
+        }
+
+        val task2 = withContext(Dispatchers.IO) {
+            delay(1000)
+            println("2.执行withContext-task2.... [当前线程为：${Thread.currentThread().name}]")
+            "two"  //返回结果赋值给task2
+        }
+
+        println("执行withContext-task1 = $task1  , 执行withContext-task2 = $task2 , 耗时 ${System.currentTimeMillis() - time1} ms  [当前线程为：${Thread.currentThread().name}]")
+    }
+    //4.2.2.1: async
+    GlobalScope.launch {
+        val time1 = System.currentTimeMillis()
+
+        val task1 = async(Dispatchers.IO) {
+            delay(2000)
+            println("1.执行async-task1.... [当前线程为：${Thread.currentThread().name}]")
+            "one"  //返回结果赋值给task1
+        }
+
+        val task2 = async(Dispatchers.IO) {
+            delay(1000)
+            println("2.执行async-task2.... [当前线程为：${Thread.currentThread().name}]")
+            "two"  //返回结果赋值给task2
+        }
+
+        println("执行async-task1 = ${task1.await()}  , async-task2 = ${task2.await()} , 耗时 ${System.currentTimeMillis() - time1} ms  [当前线程为：${Thread.currentThread().name}]")
+    }
+    //4.2.3: 线程切换
+    GlobalScope.launch(Dispatchers.Unconfined) {
+        println("Dispatchers.Unconfined: ${Thread.currentThread().name}")//输出false
+
+        //上下文切换到主线程
+        GlobalScope.launch(Dispatchers.IO) {
+            println("Dispatchers.IO: ${Thread.currentThread().name}}")//输出true
+        }
+
+    }
+    //4.3 Scope: 协程作用范围
+    //GlobalScope:表示此协程的生命周期随应用程序的生命周期, 没有和生命周期组件相关联
+    //CoroutineScope:在应用中具有生命周期的组件应该实现CoroutineScope接口, 并负责该组件内 Coroutine 的创建和管理;
+    //               以Activity为例, 比如标准库中定义的MainScope(), 另外参考KotlinInAndroid中的ScopedActivity和SimpleScopedActivity
+    //viewModelScope(androidx.lifecycle.viewModelScope)
     /*
-    6. 扩展函数
+    5. 扩展函数
      */
     fun ExtClass.foo() = println("ext") // when the same as the member foo
     fun ExtClass.foo(para: Int) = println("ext")
 
     ExtClass().foo()
     ExtClass().foo(0)
-    //7. 闭包：函数中包含函数
+    //6. 闭包：函数中包含函数
     val plus = { x: Int, y: Int -> println("$x plus $y is ${x + y}") }
     val hello = { println("Hello Kotlin") }
     fun closure(args: Array<String>) {
@@ -244,6 +332,9 @@ fun main(args: Array<String>) {
     }
     //7. 替代RxJava的骚操作
 
+
+    //将主线程延迟退出, 保证上面延时操作完成
+    Thread.sleep(5000)
 }
 
 class ExtClass {
@@ -277,10 +368,10 @@ class Derived(b: Base) : Base by b {
 class DerivedProperty<T>(private val name: String) {
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         println("this is a property delegate: $name")
-        when (name) {
-            "tom" -> return true as T
-            "jerry" -> return false as T
-            else -> return false as T
+        return when (name) {
+            "tom" -> true as T
+            "jerry" -> false as T
+            else -> false as T
         }
 
         return true as T

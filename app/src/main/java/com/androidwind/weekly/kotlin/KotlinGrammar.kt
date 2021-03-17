@@ -12,7 +12,7 @@ import com.androidwind.weekly.kotlin.other.CallBackFromJava
 fun main(args: Array<String>) {
     println("this is my first kotlin.")
     /*
-    val:常量; var:变量
+    1. val:常量; var:变量
      */
     val name = "Jack"
 //    name = "Rose" //报错
@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
     var count: Int = 100
 
     /*
-    换行: 1. \n; 2. """ +|
+    2. 换行: 1. \n; 2. """ +|
      */
     val line = "here is one line\nthis is another line"
     println(line)
@@ -34,13 +34,13 @@ fun main(args: Array<String>) {
     println(newLine)
 
     /*
-    字符串模板、占位符:$
+    3. 字符串模板、占位符:$
      */
     var template = "this is a template string called $name and length is ${name.length}"
     println(template)
 
     /*
-    null: ? ?. ?: !!
+    4. null: ? ?. ?: !!
      */
     var nullableString1: String? = "abc" //?可为空, 不加?则不能为空
     var nullableString2: String? = null
@@ -53,13 +53,13 @@ fun main(args: Array<String>) {
     println(len == null)
 
     /*
-    延迟初始化: lateinit var, by lazy
+    5. 延迟初始化: lateinit var, by lazy
      */
     lateinit var lateInitByLateinit: String//lateinit var只能用来修饰类属性, 不能用来修饰局部变量和基本类型
-    fun testLateinit() {
+    fun testLateInit() {
         lateInitByLateinit = "this is a lateinit string"
     }
-    testLateinit()
+    testLateInit()
     println(lateInitByLateinit)
     //by lazy用来修饰val变量, 可以用来修饰局部变量和基本类型，等下一次调用到的时候才会进行初始化
     val lazyByLazy: String by lazy {
@@ -69,21 +69,22 @@ fun main(args: Array<String>) {
     println(lazyByLazy)//lazyByLazy被调用到了，开始初始化，执行println("here is lazy init")，并且赋值"Zoo"
 
     /*
-    is 判断类型
+    6. is 判断类型
      */
-    if ("kotlin" is String) {
+    val isString: String? = "kotlin"
+    if (isString is String) {
         println("it's string")
     }
 
     /*
-    as 类型转换
+    7. as 类型转换
      */
     val y: Int? = 123;
     val x: String? = y as? String;
     println(x);
 
     /*
-    函数
+    8. 方法
      */
     //step1: 标准写法
     fun method1(name: String): String {
@@ -131,13 +132,13 @@ fun main(args: Array<String>) {
     println(JvmClass.name);
 
     //方法入参可以指定默认值
-    fun sayHello(who: String = "Chall", msg: String = "Hello") {
+    fun sayHello(who: String = "Jerry", msg: String = "Hello") {
         println("$who - said - $msg")
     }
     sayHello()
 
     /*
-    Class
+    9.1 Class
      */
     //open表示此类可以被继承, 用在函数上面表示此函数可以被重写
     open class KotlinClass(val name: String) {
@@ -146,11 +147,11 @@ fun main(args: Array<String>) {
         }
     }
 
-    val kotlinClass = KotlinClass("charles")
+    val kotlinClass = KotlinClass("Charles")
     kotlinClass.print(" say: hello")
 
     /*
-    Class extends Class and Implements interface
+    9.2 Class extends Class and Implements interface
      */
     class SubKotlinClass(name: String) : KotlinClass(name), CallBack { //父类构造函数直接赋值, 不再调用super
         override fun getName(id: Int) {
@@ -166,7 +167,7 @@ fun main(args: Array<String>) {
     subKotlinClass.print(" say: hello")
 
     /*
-    Class with primary constructor, 主构造器定义在类头部, 因此需要init空间做初始化
+    9.3 Class with primary constructor, 主构造器定义在类头部, 因此需要init空间做初始化
      */
     class KotlinClassConstructor1 constructor(name: String) {
         val name: String
@@ -180,21 +181,21 @@ fun main(args: Array<String>) {
     println("kotlinClassConstructor:${kotlinClassConstructor1.name}")
 
     /*
-    Class with primary constructor, 主构造器定义在类头部, 也可以在类的属性初始化声明处
+    9.4 Class with primary constructor, 主构造器定义在类头部, 也可以在类的属性初始化声明处
      */
     class KotlinClassConstructor2 constructor(name: String) {
         val prop: String = name.toUpperCase()
     }
 
     /*
-    Class with primary constructor, 如果主构造函数没有注解或可见性说明，则 constructor 关键字可以省略
+    9.5 Class with primary constructor, 如果主构造函数没有注解或可见性说明，则 constructor 关键字可以省略
      */
     class KotlinClassConstructor3(name: String) {
 
     }
 
     /*
-    Class with primary constructor, 声明属性并在主构造函数中初始化更简洁的写法
+    9.6 Class with primary constructor, 声明属性并在主构造函数中初始化更简洁的写法
      */
     class KotlinClassConstructor4(var name: String) {
 
@@ -203,7 +204,7 @@ fun main(args: Array<String>) {
     val kotlinClassConstructor4 = KotlinClassConstructor4("Jack")
     println("kotlinClassConstructor:${kotlinClassConstructor4.name}")
     /*
-    Class with secondary constructor, 次级构造器, 可以有多个
+    9.7 Class with secondary constructor, 次级构造器, 可以有多个
      */
     class KotlinClassSecondaryConstructor {
         private var name: String
@@ -236,12 +237,12 @@ fun main(args: Array<String>) {
     kotlinClassSecondaryConstructor2.print()
 
     /*
-    class withour body
+    9.8 class without body
      */
     class withoutBody
 
     /*
-    DataClass
+    9.9 DataClass
      */
     data class DataClassSample(val x: Int, val y: Int)
 
@@ -249,11 +250,11 @@ fun main(args: Array<String>) {
     println(data.x + data.y)
 
     /*
-    ArrayList and for
+    10.1 ArrayList and for
      */
     val names = arrayListOf<String>("dog", "cat")
     for (name in names) {
-        println("names contans:$name")
+        println("names contains:$name")
     }
 
     for (i in 0 until names.size) {//从0一直到names.size - 1, 方便数组遍历而设计
@@ -261,7 +262,7 @@ fun main(args: Array<String>) {
     }
 
     /*
-    Map
+    10.2 Map
      */
     val ages = mapOf<String, Int>("a" to 1, "b" to 2)
     for ((key, value) in ages) {
@@ -269,7 +270,7 @@ fun main(args: Array<String>) {
     }
 
     /*
-    可变数组
+    10.3 可变数组
      */
     val bags = mutableListOf(1, 2, 3)
     bags.add(4)
@@ -277,7 +278,7 @@ fun main(args: Array<String>) {
     println(bags[0])
 
     /*
-    while
+    10.4 while
      */
     var cnt: Int = 0;
     while (cnt < 5) {
@@ -288,7 +289,7 @@ fun main(args: Array<String>) {
         println("cnt = 5")
 
     /*
-    when: 等价于switch
+    10.5 when: 等价于switch
      */
     var a = 1
     val b = 2;
@@ -306,13 +307,19 @@ fun main(args: Array<String>) {
             println("nothing")
         }
     }
-
+    /*
+    10.6 单例
+     */
     println(Utils1.label)
     println(Utils2.hello())
-    //
+    /*
+    10.7 static
+     */
     println(CompanionTest.name)
     println(CompanionTest.run())
-    //getter and setter
+    /*
+    10.8 getter and setter
+     */
     val getterAndsetter = KotlinGetterAndSetter()
     getterAndsetter.x = 100
     println("getter and setter:" + getterAndsetter.x)
@@ -324,7 +331,7 @@ fun main(args: Array<String>) {
     person.age = -1
     println("name:${person.age}")
 
-    /* 内联函数
+    /* 11. 内联函数
                 apply	            let	                run	                with	            also
     函数体对象	this	            it	                this	            this	            it
     对象是否可省	可	                不可	            可	                可	                不可
@@ -389,6 +396,9 @@ fun main(args: Array<String>) {
         println("car's name is ${car.name}")
     }
     alsoTest()
+    /*
+    12. 其它
+     */
     //test anonymous inner class about interface
     callback.getName(123)
     //@JvmOverloads, 声明多个参数的构造函数
@@ -414,10 +424,7 @@ fun main(args: Array<String>) {
     //lambda使用下划线_, 没有用到的就用_代替
     val aa = mapOf(1 to "a", 2 to "B")
     aa.forEach { (_, value) -> println("value:$value") }
-
-    /*
-    chain use
-     */
+    // chain use
     var list = arrayOf("java", "c++", "Android", "Kotlin", "iOS")
     list.map {
         "Hello $it"

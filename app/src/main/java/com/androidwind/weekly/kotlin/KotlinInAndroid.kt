@@ -1,10 +1,12 @@
 package com.androidwind.weekly.kotlin
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import com.androidwind.weekly.kotlin.other.SimpleScopedActivity
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
@@ -28,7 +30,7 @@ class KotlinInAndroid : AppCompatActivity() {
         btn_1.setOnClickListener { toastMe() } //lambda表达式更加简洁
         //2. 控件自定义方法
         iv_1.loadUrl("https://www.baidu.com/img/bd_logo1.png")
-        //3. 控件自定义方法可放在单独的类中
+        //3. 扩展函数: 控件自定义方法可放在单独的类中
         toast("a toast")
         toast("a toast", Toast.LENGTH_LONG)
         //4. 协程
@@ -76,9 +78,12 @@ class KotlinInAndroid : AppCompatActivity() {
             var name = getResultFromNet()
             showResult(name)
         }
-
         //5. set赋值, text替换setText
         btn_1.text = "click me......"
+        //6. scoped activity
+        btn_2.setOnClickListener {
+            startActivity(Intent(this, SimpleScopedActivity::class.java))
+        }
     }
 
     private fun toastMe() {
