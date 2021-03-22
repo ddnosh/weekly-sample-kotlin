@@ -1,12 +1,13 @@
 package com.androidwind.weekly.kotlin
 
-import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import io.reactivex.ObservableSource
 import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
+import io.reactivex.functions.Function
+import io.reactivex.functions.Predicate
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import java.util.*
@@ -85,6 +86,7 @@ fun main(args: Array<String>) {
 
     /*
     2. 函数作为参数传递, 可以用作回调: T.()->Unit 和 ()->Unit
+       接受函数作为参数或者返回一个函数的函数就叫做高阶函数
      */
 
     //() -> Unit//表示无参数无返回值的Lambda表达式类型
@@ -132,9 +134,9 @@ fun main(args: Array<String>) {
     }
 
     fun getResult1(
-            arg01: Int,
-            arg02: Int,
-            method: (arg1: Int, arg2: Int) -> Int
+        arg01: Int,
+        arg02: Int,
+        method: (arg1: Int, arg2: Int) -> Int
     ) {
         println("----->msg:before")
         val ret = method(arg01, arg02);
@@ -145,7 +147,7 @@ fun main(args: Array<String>) {
 
     //T.()->Unit
     fun getResult3(
-            method: Test.() -> Unit
+        method: Test.() -> Unit
     ) {
         println("----->msg:before")
         val test1 = Test()
@@ -154,10 +156,10 @@ fun main(args: Array<String>) {
     }
 
     println(
-            getResult3(
-                    {
-                        a = "Tim"
-                    })
+        getResult3(
+            {
+                a = "Tim"
+            })
     )
 
     //2.3 函数作为参数, 指定加载位置和时机
@@ -201,36 +203,36 @@ fun main(args: Array<String>) {
     fun getUser(): Observable<String> {
         val random = Random()
         return Observable
-                .create { emitter: ObservableEmitter<String> ->
-                    //模拟网络请求
-                    println("I'm doing network,CurrentThread is " + Thread.currentThread().name + "...")
-                    Thread.sleep(1000)
-                    if (random.nextBoolean()) {
-                        emitter.onNext("Jack")
-                    } else {
-                        emitter.onError(TimeoutException("Net Error!"))
-                    }
+            .create { emitter: ObservableEmitter<String> ->
+                //模拟网络请求
+                println("I'm doing network,CurrentThread is " + Thread.currentThread().name + "...")
+                Thread.sleep(1000)
+                if (random.nextBoolean()) {
+                    emitter.onNext("Jack")
+                } else {
+                    emitter.onError(TimeoutException("Net Error!"))
                 }
-                .subscribeOn(Schedulers.io())//指定网络请求在IO线程
+            }
+            .subscribeOn(Schedulers.io())//指定网络请求在IO线程
     }
 
     fun rxjava() {
         getUser()
-                .subscribe(object : Observer<String> {
-                    override fun onComplete() {
-                    }
+            .subscribe(object : Observer<String> {
+                override fun onComplete() {
+                }
 
-                    override fun onSubscribe(d: Disposable) {
-                    }
+                override fun onSubscribe(d: Disposable) {
+                }
 
-                    override fun onNext(t: String) {
-                        println(t)
-                    }
+                override fun onNext(t: String) {
+                    println(t)
+                }
 
-                    override fun onError(e: Throwable) {
-                    }
+                override fun onError(e: Throwable) {
+                }
 
-                })
+            })
         Thread.sleep(2000)//延时2s,避免主线程销毁
     }
     //run
@@ -311,7 +313,8 @@ fun main(args: Array<String>) {
     //GlobalScope:表示此协程的生命周期随应用程序的生命周期, 没有和生命周期组件相关联
     //CoroutineScope:在应用中具有生命周期的组件应该实现CoroutineScope接口, 并负责该组件内 Coroutine 的创建和管理;
     //               以Activity为例, 比如标准库中定义的MainScope(), 另外参考KotlinInAndroid中的ScopedActivity和SimpleScopedActivity
-    //viewModelScope(androidx.lifecycle.viewModelScope)
+    //viewModelScope(androidx.lifecycle.viewModelScope, androidx.lifecycle.lifecycleScope)
+
     /*
     5. 扩展函数
      */
@@ -320,7 +323,10 @@ fun main(args: Array<String>) {
 
     ExtClass().foo()
     ExtClass().foo(0)
-    //6. 闭包：函数中包含函数
+
+    /*
+    6. 闭包：函数中包含函数
+     */
     val plus = { x: Int, y: Int -> println("$x plus $y is ${x + y}") }
     val hello = { println("Hello Kotlin") }
     fun closure(args: Array<String>) {
@@ -330,8 +336,56 @@ fun main(args: Array<String>) {
         plus(2, 8)
         hello()
     }
-    //7. 替代RxJava的骚操作
 
+    /*
+    7. 单例
+     */
+    println("Singleton: " + Single.get().pro)
+
+    /*
+    8. Kotlin海量操作符, 替代RxJava操作符
+     */
+    fun rxjavaOperators() {
+        //定义一个数组
+        val index = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+//        Observable
+//            .just(index)
+//            .flatMap(object : Function<List<Int>, Observable<Int>> {
+//                override fun apply(f: List<Int>): Observable<Int> {
+//                    return Observable.fromIterable(f)
+//                }
+//            })
+//            .filter(object : Predicate<Int> {
+//                override fun test(p: Int): Boolean {
+//                    return p % 2 == 0
+//                }
+//            })
+//            .map(object : Function<Int, String> {
+//                override fun apply(f: Int): String {
+//                    return "[rxjava]String" + f
+//                }
+//            })
+//            .subscribe(object : Consumer<String> {
+//                override fun accept(t: String?) {
+//                    println(t)
+//                }
+//            })
+        Observable
+            .just(index)
+            .flatMap { Observable.fromIterable(it) }
+            .filter { it % 2 == 0 }
+            .map { "[rxjava]String$it" }
+            .subscribe { println(it) }
+    }
+    rxjavaOperators()
+
+    fun kotlinOperators() {
+        val index = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+        index.filter { it % 2 == 0 }
+            .map { "[kotlin]String$it" }
+            .also { println(it) }
+    }
+    kotlinOperators()
 
     //将主线程延迟退出, 保证上面延时操作完成
     Thread.sleep(5000)
@@ -377,4 +431,18 @@ class DerivedProperty<T>(private val name: String) {
         return true as T
     }
 
+}
+
+class Single private constructor() {
+    val pro: Boolean = false
+
+    companion object {
+        fun get(): Single {
+            return Holder.instance
+        }
+    }
+
+    private object Holder {
+        val instance = Single()
+    }
 }
